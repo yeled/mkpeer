@@ -51,7 +51,8 @@ def main():
         print "# " + row[0]
         noc_email = ''
         for asn in pdata.keys():
-            if self_asn not in asn:
+            if self_asn not in asn:  # only work on the peer ASN, skip our own API json
+                max_prefixes_v4 = pdata[asn]['data'][0]['info_prefixes4']
                 for noc_role in pdata[asn]['data'][0]['poc_set']:
                     if 'NOC' in noc_role['role']:
                         noc_email = noc_role['email']
@@ -67,6 +68,8 @@ def main():
                             print "set protocols bgp group IX-PEERS-V4 neighbor %s peer-as %s" % (v4, i['asn'])
                             print "set protocols bgp group IX-PEERS-V4 neighbor %s description \"%s:%s:AS%s\"" \
                                   % (v4, noc_email, possible_peers[0], i['asn'])
+                            print "set protocols bgp group IX-PEERS-V4 neighbor %s family inet unicast prefix-limit maximum %s" \
+                                  % (v4, max_prefixes_v4)
 
 
 def get_facility(pdb, nettype):
