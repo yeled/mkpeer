@@ -47,8 +47,7 @@ def main():
     print possible_peers[0] + ' can peer with ' + possible_peers[1] + '!'
 
     for ix in common_ix_list:
-        row = [ix]
-        print "# " + row[0]
+        print "# " + ix
         noc_email = ''
         for asn in pdata.keys():
             if self_asn not in asn:  # only work on the peer ASN, skip our own API json
@@ -63,7 +62,7 @@ def main():
                         continue
                     if ix == i['name']:
                         # Skip if ix is not in our shared list.
-                        for entry in row:
+                        for entry in ['ix']:
                             v4 = i['ipaddr4']
                             print "set protocols bgp group IX-PEERS-V4 neighbor %s peer-as %s" % (v4, i['asn'])
                             print "set protocols bgp group IX-PEERS-V4 neighbor %s description \"%s:%s:AS%s\"" \
