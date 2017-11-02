@@ -2,7 +2,7 @@
 
 A script to be run by hand or from Ansible to automagically give you router config for peering requests.
 
-`.mkpeer.py <peer_asn>`
+`./mkpeer.py <peer_asn>`
 
 Make sure to have `$PEERINGDB_USERNAME` and `$PEERINGDB_PASSWORD` set in your environment.
 
