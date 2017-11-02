@@ -4,9 +4,22 @@ import requests
 from requests.auth import HTTPBasicAuth
 import sys
 import os
+import yaml
 
 PEERINGDB_USERNAME = os.environ.get('PEERINGDB_USERNAME', 'githubops')
 PEERINGDB_PASSWORD = os.environ.get('PEERINGDB_PASSWORD')
+
+CONFIG = 'config.yaml'
+
+config = yaml.load(open(CONFIG))
+
+
+def override_email(asn):
+    try:
+        noc_email = config['asn_overrides'][int(asn)]['noc_email']
+        return noc_email
+    except:
+        return None
 
 
 def main():
@@ -14,7 +27,7 @@ def main():
     self_asn = '36459'
     asns = [self_asn, sys.argv[1]]
     pdata = dict()
-    print("Fetching PeeringDB info")
+    print("# Fetching PeeringDB info")
     for asn in asns:
         pdata[asn] = pdb(asn)
 
@@ -22,7 +35,7 @@ def main():
         for asn in pdata.keys():
             asn = pdata[str(asn)]['data'][0]['asn']
     except IndexError:
-        print("Looks like an empty dataset, exiting")
+        print("# Looks like an empty dataset, exiting")
         print("result: %s" % pdata[asn])
         exit(1)
 
@@ -39,18 +52,18 @@ def main():
         common_ix_list = list(set(ixp[asn]).intersection(common_ix_list))
 
     if len(common_ix_list) < 1:
-        print("Didnt find any common IX, exiting...")
+        print("# Didnt find any common IX, exiting...")
         exit(1)
     possible_peers = []
     for asn in pdata.keys():
         possible_peers.append(pdata[asn]['data'][0]['name'])
-    print possible_peers[0] + ' can peer with ' + possible_peers[1] + '!'
+    print '# ' + possible_peers[0] + ' can peer with ' + possible_peers[1] + '!'
 
     for ix in common_ix_list:
         print "# " + ix
-        noc_email = ''
         for asn in pdata.keys():
             if self_asn not in asn:  # only work on the peer ASN, skip our own API json
+                noc_email = override_email(asn)
                 max_prefixes_v4 = pdata[asn]['data'][0]['info_prefixes4']
                 for noc_role in pdata[asn]['data'][0]['poc_set']:
                     if 'NOC' in noc_role['role']:
