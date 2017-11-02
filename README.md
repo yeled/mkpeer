@@ -17,4 +17,4 @@ Output is hard coded to junos set commands right now.
  - [ ] Make the config idempotent (diff clean) across multiple runs. Useful for updating prefix counts.
 
  ### License
- Based on MIT licensed https://github.com/rucarrol/PeerFinder/blob/master/peerfinder.py that exports peers using an ASN argument
+ Based on MIT licensed https://github.com/rucarrol/PeerFinder/blob/master/peerfinder.py 
