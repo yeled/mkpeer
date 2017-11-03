@@ -3,3 +3,9 @@ asn_overrides:
   6169:
     name: Kentik
     noc_email: support@kentik.com
+
+ixps:
+  equinix_ashburn:
+    pdb_id: 1
+  six:
+    pdb_id: 13
