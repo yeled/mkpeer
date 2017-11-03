@@ -6,7 +6,7 @@ import os
 import yaml
 import argparse
 
-PEERINGDB_USERNAME = os.environ.get('PEERINGDB_USERNAME', 'githubops')
+PEERINGDB_USERNAME = os.environ.get('PEERINGDB_USERNAME')
 PEERINGDB_PASSWORD = os.environ.get('PEERINGDB_PASSWORD')
 
 
