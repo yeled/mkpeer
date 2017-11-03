@@ -72,13 +72,14 @@ def main():
 def print_config(ix):
     for asn in pdata.keys():
         if self_asn not in asn:  # only work on the peer ASN, skip our own API json
-            noc_email = override_email(asn)
             max_prefixes_v4 = pdata[asn]['data'][0]['info_prefixes4']
             for noc_role in pdata[asn]['data'][0]['poc_set']:
                 if 'NOC' in noc_role['role']:
                     noc_email = noc_role['email']
                 elif 'Technical' in noc_role['role']:
                     noc_email = noc_role['email']
+            if override_email(asn) is not None:
+                noc_email = override_email(asn)
             for i in pdata[asn]['data'][0]['netixlan_set']:
                 if ix == i['ixlan_id']:
                     print "# " + i['name']
