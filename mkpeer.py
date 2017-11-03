@@ -17,6 +17,7 @@ ixp = dict()
 ixp_id = dict()
 possible_peers = []
 ixp_choices = []
+noc_email = ''
 
 for ixp_shortname in config['ixps']:
     ixp_choices.append(ixp_shortname)
@@ -76,6 +77,8 @@ def print_config(ix):
                 if 'NOC' in noc_role['role']:
                     noc_email = noc_role['email']
                 elif 'Technical' in noc_role['role']:
+                    noc_email = noc_role['email']
+                elif 'Policy' in noc_role['role']:
                     noc_email = noc_role['email']
             if override_email(asn) is not None:
                 noc_email = override_email(asn)
