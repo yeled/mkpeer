@@ -62,11 +62,10 @@ def main():
     for ix in common_ix_list:
         if ixp_restrict is None:
             print_config(ix)
+            continue
         if ix == ixp_restrict:
             print_config(ix)
-        if ix != ixp_restrict:
-            print "# but the --ixp filter has restricted the output"
-            exit(1)
+            continue
 
 
 def print_config(ix):
