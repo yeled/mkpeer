@@ -2,15 +2,15 @@
 
 A script to be run by hand or from Ansible to automagically give you router config for peering requests.
 
-`./mkpeer.py <peer_asn>`
+`usage: mkpeer.py [-h] [-i {equinix_ashburn,six}] ASN`
 
-Make sure to have `$PEERINGDB_USERNAME` and `$PEERINGDB_PASSWORD` set in your environment.
+Make sure to have `$PEERINGDB_USERNAME` and `$PEERINGDB_PASSWORD` set in your environment, or you can use email overrides to fill in the NOC contacts in the output.
 
-Output is hard coded to junos set commands right now.
+Output is hard coded to junos set commands [right now](https://github.com/yeled/mkpeer/issues/2).
 
 ### TODO
 
- - [ ] Figure out a way to only output the IXPs you are interested in.
+ - [x] Figure out a way to only output the IXPs you are interested in.
        use a yaml dict to lookup ASNs in bulk, and match against a region or IXP?
  - [ ] Specify ASNs in bulk.
  - [ ] Switch for cli use vs Ansbile templates (set commands vs config replace: code?)
