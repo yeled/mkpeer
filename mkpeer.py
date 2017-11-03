@@ -12,7 +12,7 @@ PEERINGDB_PASSWORD = os.environ.get('PEERINGDB_PASSWORD')
 
 config = yaml.load(open('config.yaml'))
 pdata = dict()
-self_asn = '36459'
+self_asn = str(config['self_asn'])
 ixp = dict()
 ixp_id = dict()
 possible_peers = []

@@ -1,4 +1,6 @@
 ---
+self_asn: 36459
+
 asn_overrides:
   6169:
     name: Kentik
