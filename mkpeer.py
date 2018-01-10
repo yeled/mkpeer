@@ -66,10 +66,6 @@ def main():
             print("# Didnt find any common IX, exiting...")
             #exit(1)
             continue
-        for asn in pdata.keys():
-            possible_peers.append(pdata[asn]['data'][0]['name'])
-        #print '#### ' + possible_peers[0] + ' can peer with ' + possible_peers[1] + '!'
-
         for ix in common_ix_list:
             if ixp_restrict is None:
                 print("# not on this IX")
@@ -89,12 +85,10 @@ def print_config(ix, peer_asn):
         new_data['inet']['peer_ips'] = []
         new_data['inet6']['peer_ips'] = []
         if self_asn not in asn:  # only work on the peer ASN, skip our own API json
-            #print str(type(asn)) + str(asn)
             new_data['peer_as'] = asn
             new_data['name'] = pdata[asn]['data'][0]['name']
             max_prefixes_v4 = pdata[asn]['data'][0]['info_prefixes4']
             max_prefixes_v6 = pdata[asn]['data'][0]['info_prefixes6']
-            #print yaml.dump(pdata[asn]['data'][0]['poc_set'], Dumper=yaml.RoundTripDumper) # debug
             for noc_role in pdata[asn]['data'][0]['poc_set']:
                 if 'NOC' in noc_role['role'] and noc_role['email'] is not None:
                     new_data['contact'] = noc_role['email']
@@ -106,14 +100,17 @@ def print_config(ix, peer_asn):
                     new_data['contact'] = noc_role['email']
                     break
             for i in pdata[asn]['data'][0]['netixlan_set']:
-                if ix == i['ixlan_id']:
-                    # Skip if ix is not in our shared list.
-                    new_data['inet']['prefix-limit'] = max_prefixes_v4
-                    new_data['inet6']['prefix-limit'] = max_prefixes_v6
-                    for entry in ['ix']:
+                if ix == i['ixlan_id']:  # Skip if ix is not in our shared list.
+                    if i['ipaddr4'] is not None:
+                        new_data['inet']['prefix-limit'] = max_prefixes_v4
                         new_data['inet']['peer_ips'].append(i['ipaddr4'])
+                    else:  # delete all inet4 if there are no peerable neighbors
+                        del new_data['inet']
+                    if i['ipaddr6'] is not None:
+                        new_data['inet6']['prefix-limit'] = max_prefixes_v6
                         new_data['inet6']['peer_ips'].append(i['ipaddr6'])
-            #print yaml.dump(new_data, Dumper=yaml.RoundTripDumper)
+                    else:  # delete all inet6 if there are no peerable neighbors
+                        del new_data['inet6']
 
 
 def get_facility_name(pdb, nettype):
