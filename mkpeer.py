@@ -94,13 +94,17 @@ def print_config(ix, peer_asn):
             new_data['name'] = pdata[asn]['data'][0]['name']
             max_prefixes_v4 = pdata[asn]['data'][0]['info_prefixes4']
             max_prefixes_v6 = pdata[asn]['data'][0]['info_prefixes6']
+            #print yaml.dump(pdata[asn]['data'][0]['poc_set'], Dumper=yaml.RoundTripDumper) # debug
             for noc_role in pdata[asn]['data'][0]['poc_set']:
-                if 'NOC' in noc_role['role']:
+                if 'NOC' in noc_role['role'] and noc_role['email'] is not None:
                     new_data['contact'] = noc_role['email']
-                elif 'Technical' in noc_role['role']:
+                    break
+                elif 'Technical' in noc_role['role'] and noc_role['email'] is not None:
                     new_data['contact'] = noc_role['email']
-                elif 'Policy' in noc_role['role']:
+                    break
+                elif 'Policy' in noc_role['role'] and noc_role['email'] is not None:
                     new_data['contact'] = noc_role['email']
+                    break
             for i in pdata[asn]['data'][0]['netixlan_set']:
                 if ix == i['ixlan_id']:
                     # Skip if ix is not in our shared list.
