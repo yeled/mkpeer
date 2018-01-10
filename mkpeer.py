@@ -18,7 +18,6 @@ possible_peers = []
 ixp_choices = []
 noc_email = ''
 new_data = dict()
-list_of_asns = []
 pdata = dict()
 
 for ixp_shortname in config['ixps']:
@@ -36,6 +35,7 @@ class MySD(yaml.SafeDumper):
 
 
 def main():
+    list_of_asns = []
     for peer_asn in args.asn:
         asns = [self_asn, peer_asn[0]]
         #print str(type(peer_asn[0])) + str(peer_asn[0]) + " main"
@@ -64,18 +64,23 @@ def main():
 
         if len(common_ix_list) < 1:
             print("# Didnt find any common IX, exiting...")
-            exit(1)
+            #exit(1)
+            continue
         for asn in pdata.keys():
             possible_peers.append(pdata[asn]['data'][0]['name'])
         #print '#### ' + possible_peers[0] + ' can peer with ' + possible_peers[1] + '!'
 
         for ix in common_ix_list:
             if ixp_restrict is None:
-                print("# exiting...")
-                exit(1)
+                print("# not on this IX")
+                #exit(1)
+                continue
             if ix == ixp_restrict:
                 print_config(ix, peer_asn)
-        print yaml.dump(list_of_asns, Dumper=MySD)
+                print new_data # this is debug
+# https://stackoverflow.com/questions/5244810/python-appending-a-dictionary-to-a-list-i-see-a-pointer-like-behavior
+                list_of_asns.append(new_data.copy())
+    print yaml.dump(list_of_asns, Dumper=yaml.RoundTripDumper)
 
 def print_config(ix, peer_asn):
     for asn in peer_asn:
@@ -105,7 +110,6 @@ def print_config(ix, peer_asn):
                         new_data['inet']['peer_ips'].append(i['ipaddr4'])
                         new_data['inet6']['peer_ips'].append(i['ipaddr6'])
             #print yaml.dump(new_data, Dumper=yaml.RoundTripDumper)
-        list_of_asns.append(new_data)
 
 
 def get_facility_name(pdb, nettype):
