@@ -77,7 +77,7 @@ def main():
                 continue
             if ix == ixp_restrict:
                 print_config(ix, peer_asn)
-                print new_data # this is debug
+                #print new_data # this is debug
 # https://stackoverflow.com/questions/5244810/python-appending-a-dictionary-to-a-list-i-see-a-pointer-like-behavior
                 list_of_asns.append(new_data.copy())
     print yaml.dump(list_of_asns, Dumper=yaml.RoundTripDumper)
