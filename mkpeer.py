@@ -10,7 +10,7 @@ PEERINGDB_USERNAME = os.environ.get('PEERINGDB_USERNAME')
 PEERINGDB_PASSWORD = os.environ.get('PEERINGDB_PASSWORD')
 
 
-config = yaml.load(open('config.yaml'), Loader=yaml.Loader)
+config = yaml.load(open('mkpeer_config.yaml'), Loader=yaml.Loader)
 self_asn = str(config['self_asn'])
 ixp = dict()
 ixp_id = dict()
@@ -38,12 +38,9 @@ def main():
     list_of_asns = []
     for peer_asn in args.asn:
         asns = [self_asn, peer_asn[0]]
-        #print str(type(peer_asn[0])) + str(peer_asn[0]) + " main"
         ixp_restrict = fetch_ixp_id(args.ixp)
-        for asn in asns:
-            #print asn # print each asn tuple
+        for asn in asns:  # populate pdata with all the json for each -a asn
             pdata[asn] = pdb(asn)
-            #print yaml.dump(pdata, Dumper=yaml.RoundTripDumper)
         try:
             for asn in peer_asn:
                 asn = pdata[str(asn)]['data'][0]['asn']
@@ -51,31 +48,11 @@ def main():
             print("# Looks like an empty dataset, exiting")
             print("result: %s" % pdata[asn])
             exit(1)
-
-        # Dump all our ix names into a list
-        ixp[asn] = get_facility_name(pdata[str(asn)], "netixlan_set")
-        ixp_id[asn] = get_facility_id(pdata[str(asn)], "netixlan_set")
-
-        # For all our IXs, see if they have the same IX
-        # Have to seed the common ix list with the first entry
-        common_ix_list = ixp[list(ixp)[0]]
-        for asn in ixp:
-            common_ix_list = list(set(ixp[asn]).intersection(common_ix_list))
-
-        if len(common_ix_list) < 1:
-            print("# Didnt find any common IX, exiting...")
-            #exit(1)
-            continue
-        for ix in common_ix_list:
-            if ixp_restrict is None:
-                print("# not on this IX")
-                #exit(1)
-                continue
-            if ix == ixp_restrict:
-                print_config(ix, peer_asn)
-                #print new_data # this is debug
-# https://stackoverflow.com/questions/5244810/python-appending-a-dictionary-to-a-list-i-see-a-pointer-like-behavior
-                list_of_asns.append(new_data.copy())
+        print_config(ixp_restrict, peer_asn)
+        if new_data is None:
+            break
+        else:
+            list_of_asns.append(new_data.copy())
     print yaml.dump(list_of_asns, Dumper=yaml.RoundTripDumper)
 
 def print_config(ix, peer_asn):
@@ -99,17 +76,21 @@ def print_config(ix, peer_asn):
             new_data['inet6'] = {}
             new_data['inet']['peer_ips'] = []
             new_data['inet6']['peer_ips'] = []
-            for i in pdata[asn]['data'][0]['netixlan_set']:
-                if ix == i['ixlan_id']:  # Skip if ix is not in our shared list.
-                    new_data['inet']['prefix-limit'] = max_prefixes_v4
-                    new_data['inet']['peer_ips'].append(i['ipaddr4'])
-                    new_data['inet6']['prefix-limit'] = max_prefixes_v6
-                    new_data['inet6']['peer_ips'].append(i['ipaddr6'])
+            try:
+                for i in pdata[asn]['data'][0]['netixlan_set']:
+                    if ix == i['ixlan_id']:  # Skip if ix is not in our shared list.
+                        new_data['inet']['prefix-limit'] = max_prefixes_v4
+                        new_data['inet']['peer_ips'].append(i['ipaddr4'])
+                        new_data['inet6']['prefix-limit'] = max_prefixes_v6
+                        new_data['inet6']['peer_ips'].append(i['ipaddr6'])
             # if there is no peerable neighbor - delete the whole inet/inet6 list
-            if i['ipaddr4'] is None:
-                del new_data['inet']
-            if i['ipaddr6'] is None:
-                del new_data['inet6']
+                        if i['ipaddr4'] is None:
+                            del new_data['inet']
+                        if i['ipaddr6'] is None:
+                            del new_data['inet6']
+            except UnboundLocalError:
+                new_data.clear()
+                return None
 
 
 def get_facility_name(pdb, nettype):
