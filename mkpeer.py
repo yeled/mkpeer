@@ -10,7 +10,7 @@ PEERINGDB_USERNAME = os.environ.get('PEERINGDB_USERNAME')
 PEERINGDB_PASSWORD = os.environ.get('PEERINGDB_PASSWORD')
 
 
-config = yaml.load(open('config.yaml'), Loader=yaml.Loader)
+config = yaml.load(open('mkpeer_config.yaml'), Loader=yaml.Loader)
 self_asn = str(config['self_asn'])
 ixp = dict()
 ixp_id = dict()
