@@ -80,10 +80,6 @@ def main():
 
 def print_config(ix, peer_asn):
     for asn in peer_asn:
-        new_data['inet'] = {}
-        new_data['inet6'] = {}
-        new_data['inet']['peer_ips'] = []
-        new_data['inet6']['peer_ips'] = []
         if self_asn not in asn:  # only work on the peer ASN, skip our own API json
             new_data['peer_as'] = asn
             new_data['name'] = pdata[asn]['data'][0]['name']
@@ -99,18 +95,21 @@ def print_config(ix, peer_asn):
                 elif 'Policy' in noc_role['role'] and noc_role['email'] is not None:
                     new_data['contact'] = noc_role['email']
                     break
+            new_data['inet'] = {}
+            new_data['inet6'] = {}
+            new_data['inet']['peer_ips'] = []
+            new_data['inet6']['peer_ips'] = []
             for i in pdata[asn]['data'][0]['netixlan_set']:
                 if ix == i['ixlan_id']:  # Skip if ix is not in our shared list.
-                    if i['ipaddr4'] is not None:
-                        new_data['inet']['prefix-limit'] = max_prefixes_v4
-                        new_data['inet']['peer_ips'].append(i['ipaddr4'])
-                    else:  # delete all inet4 if there are no peerable neighbors
-                        del new_data['inet']
-                    if i['ipaddr6'] is not None:
-                        new_data['inet6']['prefix-limit'] = max_prefixes_v6
-                        new_data['inet6']['peer_ips'].append(i['ipaddr6'])
-                    else:  # delete all inet6 if there are no peerable neighbors
-                        del new_data['inet6']
+                    new_data['inet']['prefix-limit'] = max_prefixes_v4
+                    new_data['inet']['peer_ips'].append(i['ipaddr4'])
+                    new_data['inet6']['prefix-limit'] = max_prefixes_v6
+                    new_data['inet6']['peer_ips'].append(i['ipaddr6'])
+            # if there is no peerable neighbor - delete the whole inet/inet6 list
+            if i['ipaddr4'] is None:
+                del new_data['inet']
+            if i['ipaddr6'] is None:
+                del new_data['inet6']
 
 
 def get_facility_name(pdb, nettype):
